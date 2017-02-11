@@ -2,6 +2,8 @@ FROM alpine:3.4
 
 WORKDIR /ansible
 
+ENV ANSIBLE_DOCKER_VERSION 2.2.1.0
+
 RUN apk add --update --no-cache \
         python \
         py-pip \
@@ -12,7 +14,7 @@ RUN apk add --update --no-cache \
         build-base \
         libffi-dev \
     && pip install --upgrade pip \
-    && pip install --upgrade ansible \
+    && pip install --upgrade ansible==${ANSIBLE_DOCKER_VERSION} \
     && apk del build-deps
 
 ENTRYPOINT [ "ansible" ]
