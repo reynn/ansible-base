@@ -1,0 +1,16 @@
+FROM fedora:25
+
+WORKDIR /ansible
+
+ARG ANSIBLE_VERSION
+
+RUN dnf install -vy \
+      python \
+      libffi-devel \
+      openssl-devel \
+      python-devel \
+      redhat-rpm-config \
+      gcc \
+    && pip install --upgrade pip ansible==${ANSIBLE_VERSION}
+
+ENTRYPOINT [ "ansible" ]
