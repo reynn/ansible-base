@@ -11,6 +11,9 @@ RUN dnf install -vy \
       python-devel \
       redhat-rpm-config \
       gcc \
-    && pip install --upgrade pip ansible==${ANSIBLE_VERSION}
+    && pip install --upgrade pip ansible==${ANSIBLE_VERSION} \
+    && dnf remove -y gcc \
+      openssl-devel \
+      python-devel
 
 ENTRYPOINT [ "ansible" ]

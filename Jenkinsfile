@@ -41,10 +41,12 @@ node('docker') {
       parallel parallelBuilds
     }
 
-    stage('Publish Docker images to hub.docker.com') {
-      docker.withRegistry('', '54154007-6bac-4f89-be72-c253834b539a') {
+    if (env.CURRENT_BRANCH == 'master') {
+      stage('Publish Docker images to hub.docker.com') {
         for (image in dockerImages) {
-          image.push()
+          docker.withRegistry('', '54154007-6bac-4f89-be72-c253834b539a') {
+            def imagePushed = image.push()
+          }
         }
       }
     }
