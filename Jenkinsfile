@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library("pipelineLibraries")
+@Library("pipelineLibraries@master")
 
 node('docker') {
 
