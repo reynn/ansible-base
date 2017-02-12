@@ -5,24 +5,24 @@ machine:
 dependencies:
   override:
     - docker info
-    - docker build --rm=false -f Dockerfile-ubuntu -t reynn/ansible:<%= ENV['ANSIBLE_VERSION'] %>-ubuntu .
-    - docker build --rm=false -f Dockerfile-alpine -t reynn/ansible:<%= ENV['ANSIBLE_VERSION'] %>-alpine .
-    - docker build --rm=false -f Dockerfile-centos -t reynn/ansible:<%= ENV['ANSIBLE_VERSION'] %>-centos .
-    - docker build --rm=false -f Dockerfile-fedora25 -t reynn/ansible:<%= ENV['ANSIBLE_VERSION'] %>-fedora25 .
+    - docker build --rm=false -f Dockerfile-ubuntu -t "reynn/ansible:${ANSIBLE_VERSION}-ubuntu" .
+    - docker build --rm=false -f Dockerfile-alpine -t "reynn/ansible:${ANSIBLE_VERSION}-alpine" .
+    - docker build --rm=false -f Dockerfile-centos -t "reynn/ansible:${ANSIBLE_VERSION}-centos" .
+    - docker build --rm=false -f Dockerfile-fedora25 -t "reynn/ansible:${ANSIBLE_VERSION}-fedora25" .
 
 test:
   override:
-    - docker run --rm -it reynn/ansible:<%= ENV['ANSIBLE_VERSION'] %>-ubuntu --version
-    - docker run --rm -it reynn/ansible:<%= ENV['ANSIBLE_VERSION'] %>-alpine --version
-    - docker run --rm -it reynn/ansible:<%= ENV['ANSIBLE_VERSION'] %>-centos --version
-    - docker run --rm -it reynn/ansible:<%= ENV['ANSIBLE_VERSION'] %>-fedora25 --version
+    - docker run --rm -it "reynn/ansible:${ANSIBLE_VERSION}-ubuntu" --version
+    - docker run --rm -it "reynn/ansible:${ANSIBLE_VERSION}-alpine" --version
+    - docker run --rm -it "reynn/ansible:${ANSIBLE_VERSION}-centos" --version
+    - docker run --rm -it "reynn/ansible:${ANSIBLE_VERSION}-fedora25" --version
 
 deployment:
   hub:
     branch: master
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      - docker push reynn/ansible:<%= ENV['ANSIBLE_VERSION'] %>-ubuntu
-      - docker push reynn/ansible:<%= ENV['ANSIBLE_VERSION'] %>-alpine
-      - docker push reynn/ansible:<%= ENV['ANSIBLE_VERSION'] %>-centos
-      - docker push reynn/ansible:<%= ENV['ANSIBLE_VERSION'] %>-fedora25
+      - docker push "reynn/ansible:${ANSIBLE_VERSION}-ubuntu"
+      - docker push "reynn/ansible:${ANSIBLE_VERSION}-alpine"
+      - docker push "reynn/ansible:${ANSIBLE_VERSION}-centos"
+      - docker push "reynn/ansible:${ANSIBLE_VERSION}-fedora25"
