@@ -3,9 +3,7 @@
 node('docker') {
 
   // available to view at https://github.com/reynn/jenkins-pipeline
-  @Library("pipelineLibraries@master") _
-
-  def pipeline = new net.reynn.Utilities()
+  @Library("pipelineLibraries@master")
 
   stage('Checkout from GitHub') {
     checkout scm
@@ -48,15 +46,15 @@ node('docker') {
           image.inside {
             sh "cat /etc/*release"
           }
-          pipeline.pushDockerImage(image)
+          pushDockerImage(image)
         }
       }
     }
 
     currentBuild.result = 'SUCCESS'
-    pipeline.sendSlackMessage("Successfully built ${JOB_NAME}\nAnsible Version: ${ansibleVersion}\nDuration: ${currentBuild.duration}")
+    sendSlackMessage("Successfully built ${JOB_NAME}\nAnsible Version: ${ansibleVersion}\nDuration: ${currentBuild.duration}")
   } catch (Exception ex) {
     currentBuild.result = 'FAILURE'
-    pipeline.sendSlackMessage("Failed to build ${JOB_NAME}: ${ex.message}", 'warning')
+    sendSlackMessage("Failed to build ${JOB_NAME}: ${ex.message}", 'warning')
   }
 }
