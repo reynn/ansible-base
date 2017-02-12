@@ -35,27 +35,24 @@ node('docker') {
     }
   }
 
-  try {
-    stage('Build Docker images') {
-      parallel parallelBuilds
-    }
+  stage('Build Docker images') {
+    parallel parallelBuilds
+  }
 
-    if (env.BRANCH_NAME == 'master') {
-      stage('Publish Docker images to hub.docker.com') {
-        for (imageName in dockerImageNames) {
-          println "------------------- Image name: ${imageName} -------------------"
-          docker.image(imageName).inside {
-            sh "cat /etc/*release"
-          }
-          docker.image(imageName).push('', '54154007-6bac-4f89-be72-c253834b539a')
+  if (env.BRANCH_NAME == 'master') {
+    stage('Publish Docker images to hub.docker.com') {
+      for (imageName in dockerImageNames) {
+        println "------------------- Image name: ${imageName} -------------------"
+        docker.image(imageName).inside {
+          sh "cat /etc/*release"
+        }
+        withRegistry('', '54154007-6bac-4f89-be72-c253834b539a') {
+          docker.image(imageName).push()
         }
       }
     }
-
-    currentBuild.result = 'SUCCESS'
-    sendSlackMessage("Successfully built ${JOB_NAME}\nAnsible Version: ${ansibleVersion}\nDuration: ${currentBuild.duration}")
-  } catch (Exception ex) {
-    currentBuild.result = 'FAILURE'
-    sendSlackMessage("Failed to build ${JOB_NAME}: ${ex.message}", 'warning')
   }
+
+  currentBuild.result = 'SUCCESS'
+  sendSlackMessage("Successfully built ${JOB_NAME}\nAnsible Version: ${ansibleVersion}\nDuration: ${currentBuild.duration}")
 }
