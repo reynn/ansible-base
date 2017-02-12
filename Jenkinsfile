@@ -1,11 +1,10 @@
 #!/usr/bin/env groovy
 
-def sendSlackMessage = {
-  msg = '', msgColor = 'good' ->
-    slackSend color: msgColor, message: msg, tokenCredentialId: '29731667-bfb1-433d-8dc1-f76d2a69c226'
-}
+@Library("pipelineLibraries")
 
 node('docker') {
+
+  def pipeline = new net.reynn.Utilities()
 
   stage('Checkout from GitHub') {
     checkout scm
@@ -44,21 +43,19 @@ node('docker') {
     if (env.BRANCH_NAME == 'master') {
       stage('Publish Docker images to hub.docker.com') {
         for (image in dockerImages) {
-          println "Image name: ${image.id}"
+          println "------------------- Image name: ${image.id} -------------------"
           image.inside {
             sh "cat /etc/*release"
           }
-          docker.withRegistry('', '54154007-6bac-4f89-be72-c253834b539a') {
-            def imagePushed = image.push()
-          }
+          pipeline.pushDockerImage(image)
         }
       }
     }
 
     currentBuild.result = 'SUCCESS'
-    sendSlackMessage("Successfully built ${JOB_NAME}\nAnsible Version: ${ansibleVersion}\nDuration: ${currentBuild.duration}")
+    pipeline.sendSlackMessage("Successfully built ${JOB_NAME}\nAnsible Version: ${ansibleVersion}\nDuration: ${currentBuild.duration}")
   } catch (Exception ex) {
     currentBuild.result = 'FAILURE'
-    sendSlackMessage("Failed to build ${JOB_NAME}: ${ex.message}", 'warning')
+    pipeline.sendSlackMessage("Failed to build ${JOB_NAME}: ${ex.message}", 'warning')
   }
 }
