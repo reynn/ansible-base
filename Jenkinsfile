@@ -2,6 +2,7 @@
 
 node('docker') {
 
+  // available to view at https://github.com/reynn/jenkins-pipeline
   @Library("pipelineLibraries@master") _
 
   def pipeline = new net.reynn.Utilities()
@@ -28,7 +29,7 @@ node('docker') {
             unstash 'dockerfiles'
 
             dockerImages.add(dockerImages.add(docker.build("reynn/ansible:${ansibleVersion}-${distro}",
-              "-f Dockerfile-${distro} --no-cache --build-arg 'ANSIBLE_VERSION=${ansibleVersion}' .")))
+              "-f Dockerfile-${distro} --build-arg 'ANSIBLE_VERSION=${ansibleVersion}' .")))
           }
         }
       }
