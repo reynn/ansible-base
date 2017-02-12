@@ -12,7 +12,7 @@ node('docker') {
   // Variables
   String ansibleVersion = "2.2.1.0"
   def parallelBuilds = [:]
-  List dockerImages = []
+  List dockerImageNames = []
 
   stage('Setup') {
 
@@ -25,9 +25,10 @@ node('docker') {
         parallelBuilds[distro] = {
           node {
             unstash 'dockerfiles'
+            String imageName = "reynn/ansible:${ansibleVersion}-${distro}"
+            docker.build(imageName, "-f Dockerfile-${distro} --build-arg 'ANSIBLE_VERSION=${ansibleVersion}' .")
 
-            dockerImages.add(dockerImages.add(docker.build("reynn/ansible:${ansibleVersion}-${distro}",
-              "-f Dockerfile-${distro} --build-arg 'ANSIBLE_VERSION=${ansibleVersion}' .")))
+            dockerImageNames.add(imageName)
           }
         }
       }
@@ -41,12 +42,12 @@ node('docker') {
 
     if (env.BRANCH_NAME == 'master') {
       stage('Publish Docker images to hub.docker.com') {
-        for (image in dockerImages) {
-          println "------------------- Image name: ${image.id} -------------------"
-          image.inside {
+        for (imageName in dockerImageNames) {
+          println "------------------- Image name: ${imageName} -------------------"
+          docker.image(imageName).inside {
             sh "cat /etc/*release"
           }
-          pushDockerImage(image)
+          docker.image(imageName).push('', '54154007-6bac-4f89-be72-c253834b539a')
         }
       }
     }
