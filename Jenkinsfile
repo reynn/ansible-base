@@ -1,8 +1,8 @@
 #!/usr/bin/env groovy
 
-@Library("pipelineLibraries@master")
-
 node('docker') {
+
+  @Library("pipelineLibraries@master") _
 
   def pipeline = new net.reynn.Utilities()
 
