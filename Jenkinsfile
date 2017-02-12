@@ -8,12 +8,13 @@ node {
   stage('Setup') {
     String ansibleVersion = "2.2.1.0"
     List dockerDistros = ["ubuntu", "alpine", "centos"]
-    
+
     for (distro in dockerDistros) {
       def dockerfileExists = fileExists "Dockerfile-${distro}"
       if (dockerfileExists) {
-        parallelBuilds[distro] = docker.build("reynn/ansible:${ansibleVersion}-alpine",
-                                                 "-f Dockerfile-alpine --build-arg 'ANSIBLE_VERSION=${ansibleVersion}' .")
+        parallelBuilds[distro] = {
+          docker.build("reynn/ansible:${ansibleVersion}-alpine", "-f Dockerfile-alpine --build-arg 'ANSIBLE_VERSION=${ansibleVersion}' .")
+        }
       }
     }
   }
