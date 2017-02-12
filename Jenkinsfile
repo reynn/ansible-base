@@ -7,7 +7,7 @@ node {
   List dockerImages = ["ubuntu", "alpine", "centos"]
 
   def builtImage = docker.build("reynn/ansible:${ansibleVersion}-alpine",
-    "-f Dockerfile-alpine --build-arg 'ANSBILE_VERSION=${ansibleVersion}' .")
+    "-f Dockerfile-alpine --build-arg 'ANSIBLE_VERSION=${ansibleVersion}' .")
 
   deleteDir()
 }
