@@ -3,7 +3,7 @@
 node('docker') {
 
   // available to view at https://github.com/reynn/jenkins-pipeline
-  @Library("pipelineLibraries@master")
+  @Library("pipelineLibraries@master") _
 
   stage('Checkout from GitHub') {
     checkout scm
