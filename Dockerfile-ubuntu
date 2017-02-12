@@ -1,20 +1,16 @@
-FROM alpine:3.4
+FROM ubuntu:16.04
 
 WORKDIR /ansible
 
 ARG ANSIBLE_VERSION
 
-RUN apk add --update --no-cache \
+RUN apt update \
+    && apt install -y \
         python \
-        py-pip \
-        libffi \
-        openssl-dev \
-    && apk add --update --no-cache --virtual build-deps \
-        python-dev \
-        build-base \
+        python-pip \
         libffi-dev \
-    && pip install --upgrade pip \
-    && pip install --upgrade ansible==${ANSIBLE_VERSION} \
-    && apk del build-deps
+        libssl-dev \
+        python-dev \
+    && pip install --upgrade pip ansible==${ANSIBLE_VERSION}
 
 ENTRYPOINT [ "ansible" ]

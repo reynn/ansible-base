@@ -4,10 +4,19 @@ node {
   }
 
   String ansibleVersion = "2.2.1.0"
-  List dockerImages = ["ubuntu", "alpine", "centos"]
+  List dockerDistros = ["ubuntu", "alpine", "centos"]
 
-  def builtImage = docker.build("reynn/ansible:${ansibleVersion}-alpine",
-    "-f Dockerfile-alpine --build-arg 'ANSIBLE_VERSION=${ansibleVersion}' .")
+  def parallelBuilds = [:]
+
+  for (distro in dockerDistros) {
+    def dockerfileExists = fileExists "Dockerfile-${distro}"
+    if (dockerfileExists) {
+      parallelBuilds[dockerImage] = docker.build("reynn/ansible:${ansibleVersion}-alpine",
+                                               "-f Dockerfile-alpine --build-arg 'ANSIBLE_VERSION=${ansibleVersion}' .")
+    }
+  }
+
+  parallel parallelBuilds
 
   deleteDir()
 }
