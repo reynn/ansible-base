@@ -41,9 +41,13 @@ node('docker') {
       parallel parallelBuilds
     }
 
-    if (env.CURRENT_BRANCH == 'master') {
+    if (env.BRANCH_NAME == 'master') {
       stage('Publish Docker images to hub.docker.com') {
         for (image in dockerImages) {
+          println "Image name: ${image.id}"
+          image.inside {
+            sh "cat /etc/*release"
+          }
           docker.withRegistry('', '54154007-6bac-4f89-be72-c253834b539a') {
             def imagePushed = image.push()
           }
