@@ -1,6 +1,8 @@
 machine:
   services:
     - docker
+  environment:
+    ANSIBLE_VERSION: 2.2.1.0
 
 dependencies:
   override:
