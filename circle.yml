@@ -1,7 +1,5 @@
 version: 2
-executorType: docker
-containerInfo:
-  - image: ubuntu:16.04
+executorType: machine
 stages:
   build:
     parallel: 4
