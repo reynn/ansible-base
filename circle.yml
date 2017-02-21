@@ -1,9 +1,12 @@
 version: 2
-# executorType: docker
+executorType: docker
+images:
+  - python:2.7.12
 stages:
   build:
     parallel: 4
     steps:
+      - type: setup-docker-engine
       - type: shell
         command: docker build --rm=false -f Dockerfile-ubuntu --build-arg ANSIBLE_VERSION=$ANSIBLE_VERSION -t "reynn/ansible:$ANSIBLE_VERSION-ubuntu" .
       - type: shell
