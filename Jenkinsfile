@@ -3,31 +3,31 @@
 // available to view at https://github.com/reynn/jenkins-pipeline
 @Library("pipelineLibraries")_
 
-buildDocker {
+// Variables
+String ansibleVersion = '2.2.1.0'
+String dockerRegistryUri = 'https://nexus.reynn.net'
+def parallelBuilds = [:]
+List dockerImageNames = []
+
+nodeDocker {
   stage('Checkout from GitHub') {
     checkout scm
   }
 
-  // Variables
-  String ansibleVersion = "2.2.1.0"
-  def parallelBuilds = [:]
-  List dockerImageNames = []
-
   stage('Setup') {
 
-    List dockerDistros = ["alpine"]
+    List dockerDistros = ["alpine", "ubuntu"]
     stash includes: 'Dockerfile*', name: 'dockerfiles'
 
     for (distro in dockerDistros) {
       def dockerfileExists = fileExists "Dockerfile-${distro}"
+      String imageName = "reynn/ansible:${ansibleVersion}-${distro}"
       if (dockerfileExists) {
+        dockerImageNames.add(imageName)
         parallelBuilds[distro] = {
           node {
             unstash 'dockerfiles'
-            String imageName = "reynn/ansible:${ansibleVersion}-${distro}"
-            docker.build(imageName, "-f Dockerfile-${distro} --build-arg 'ANSIBLE_VERSION=${ansibleVersion}' .")
-
-            dockerImageNames.add(imageName)
+            def image = docker.build(imageName, "-f Dockerfile-${distro} --build-arg 'ANSIBLE_VERSION=${ansibleVersion}' .")
           }
         }
       }
@@ -39,13 +39,13 @@ buildDocker {
   }
 
   if (env.BRANCH_NAME == 'master') {
-    stage('Publish Docker images to hub.docker.com') {
+    stage("Publish Docker images to ${dockerRegistryUri}") {
       for (imageName in dockerImageNames) {
         println "------------------- Image name: ${imageName} -------------------"
         docker.image(imageName).inside {
           sh "cat /etc/*release"
         }
-        withRegistry('nexus.reynn.net', 'reynn-docker-repo-creds') {
+        docker.withRegistry(dockerRegistryUri, 'reynn-docker-repo-creds') {
           docker.image(imageName).push()
         }
       }
@@ -53,5 +53,6 @@ buildDocker {
   }
 
   currentBuild.result = 'SUCCESS'
-  sendSlackMessage("Successfully built ${JOB_NAME}\nAnsible Version: ${ansibleVersion}\nDuration: ${currentBuild.duration}")
+  String slackMsg = "Successfully built ${JOB_NAME}\nAnsible Version: ${ansibleVersion}\nDuration: ${currentBuild.duration}"
+  sendSlackMessage(slackMsg, '#git-notifications', 'mimikyu-sever')
 }
