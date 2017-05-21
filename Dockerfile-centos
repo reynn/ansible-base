@@ -2,7 +2,7 @@ FROM centos:7
 
 WORKDIR /ansible
 
-ARG ANSIBLE_VERSION
+ENV ANSIBLE_VERSION 2.3.0.0
 
 RUN yum install -y epel-release \
     && yum install -y \

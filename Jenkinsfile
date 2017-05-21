@@ -4,50 +4,38 @@
 @Library("pipelineLibraries")_
 
 // Variables
-String ansibleVersion = '2.2.1.0'
-String dockerRegistryUri = 'https://nexus.reynn.net'
-def parallelBuilds = [:]
-List dockerImageNames = []
+
+properties([
+      [$class: 'DatadogJobProperty', tagFile: '', tagProperties: ''],
+      parameters([
+        string(defaultValue: '', description: 'Version of Ansible to install in image', name: 'ansibleVersion'),
+        booleanParam(defaultValue: false, description: '', name: 'forcePush')
+      ]),
+      pipelineTriggers([])]
+)
 
 nodeDocker {
   stage('Checkout from GitHub') {
     checkout scm
   }
 
-  stage('Setup') {
-
-    List dockerDistros = ["alpine", "ubuntu"]
-    stash includes: 'Dockerfile*', name: 'dockerfiles'
-
-    for (distro in dockerDistros) {
+  stage('Build Images') {
+    for (distro in ['alpine', 'ubuntu']) {
       def dockerfileExists = fileExists "Dockerfile-${distro}"
       String imageName = "reynn/ansible:${ansibleVersion}-${distro}"
+      String buildArgs = " "
       if (dockerfileExists) {
         dockerImageNames.add(imageName)
-        parallelBuilds[distro] = {
-          node {
-            unstash 'dockerfiles'
-            def image = docker.build(imageName, "-f Dockerfile-${distro} --build-arg 'ANSIBLE_VERSION=${ansibleVersion}' .")
-          }
-        }
+        def image = docker.build(imageName, buildArgs)
       }
     }
   }
 
-  stage('Build Docker images') {
-    parallel parallelBuilds
-  }
-
-  if (env.BRANCH_NAME == 'master') {
+  if (env.BRANCH_NAME == 'master' || forcePush) {
     stage("Publish Docker images to ${dockerRegistryUri}") {
       for (imageName in dockerImageNames) {
         println "------------------- Image name: ${imageName} -------------------"
-        docker.image(imageName).inside {
-          sh "cat /etc/*release"
-        }
-        docker.withRegistry(dockerRegistryUri, 'reynn-docker-repo-creds') {
-          docker.image(imageName).push()
-        }
+        docker.image(imageName).push()
       }
     }
   }

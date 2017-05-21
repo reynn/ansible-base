@@ -1,8 +1,11 @@
-FROM alpine:3.4
+FROM alpine:3.5
 
 WORKDIR /ansible
 
-ARG ANSIBLE_VERSION
+ENV ANSIBLE_VERSION 2.3.0.0
+
+LABEL ANSIBLE_VERSION=$ANSIBLE_VERSION \
+      ALPINE_VERSION=3.5
 
 RUN apk add --update --no-cache \
         python \
