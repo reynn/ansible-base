@@ -1,20 +1,19 @@
 #!/usr/bin/env groovy
-
 // available to view at https://github.com/reynn/jenkins-pipeline
 @Library("pipelineLibraries")_
 
-// Variables
-
 properties([
-      [$class: 'DatadogJobProperty', tagFile: '', tagProperties: ''],
-      parameters([
-        string(defaultValue: '', description: 'Version of Ansible to install in image', name: 'ansibleVersion'),
-        booleanParam(defaultValue: false, description: '', name: 'forcePush')
-      ]),
-      pipelineTriggers([])]
+  [$class: 'DatadogJobProperty', tagFile: '', tagProperties: ''],
+  parameters([
+    string(defaultValue: '', description: 'Version of Ansible to install in image', name: 'ansibleVersion'),
+    booleanParam(defaultValue: false, description: '', name: 'forcePush')
+  ]),
+  pipelineTriggers([])]
 )
 
+// Variables
 List dockerImageNames = []
+def reynnUtils = new net.reynn.utils()
 if (!params.ansibleVersion) {
   error('Unable to build image without providing the Ansible Version')
 }
@@ -37,7 +36,7 @@ nodeDocker {
         for(version in splitVersions) {
           String imageName = "reynn/ansible-${distro}:${version}"
           dockerImageNames.add(imageName)
-          println " Building ${imageName} ".center(120, '#')
+          reynnUtils.centerPrint(" Building ${imageName} ")
           withEnv(["ANSIBLE_VERSION=${version}"]) {
             docker.build(imageName, "-f Dockerfile-${distro} .")
           }
