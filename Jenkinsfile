@@ -23,16 +23,23 @@ nodeDocker {
     checkout scm
   }
 
-  stage('Build Images') {
-    for (distro in ['alpine', 'ubuntu', 'centos', 'fedora25']) {
-      def dockerfileExists = fileExists "Dockerfile-${distro}"
-      String imageName = "reynn/ansible-${distro}:${params.ansibleVersion}"
-      if (dockerfileExists) {
-        dockerImageNames.add(imageName)
-        def ansibleVersions = params.ansibleVersion.split(',')
-        for(ver in ansibleVersions) {
-          withEnv(["ANSIBLE_VERSION=${ver}"]) {
-            def image = docker.build(imageName, "-f Dockerfile-${distro} .")
+  List splitVersions = []
+  for (v in params.ansibleVersion.split(',')) {
+    splitVersions.add(v)
+  }
+  println splitVersions
+  println splitVersions.getClass()
+
+  for (distro in ['alpine', 'ubuntu', 'centos', 'fedora25']) {
+    def dockerfileExists = fileExists "Dockerfile-${distro}"
+    if (dockerfileExists) {
+      stage("Building ansible-${distro} image images") {
+        for(version in splitVersions) {
+          String imageName = "reynn/ansible-${distro}:${version}"
+          dockerImageNames.add(imageName)
+          println " Building ${imageName} ".center(120, '#')
+          withEnv(["ANSIBLE_VERSION=${version}"]) {
+            docker.build(imageName, "-f Dockerfile-${distro} .")
           }
         }
       }
