@@ -14,6 +14,8 @@ properties([
       pipelineTriggers([])]
 )
 
+List dockerImageNames = []
+
 nodeDocker {
   stage('Checkout from GitHub') {
     checkout scm
