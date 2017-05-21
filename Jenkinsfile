@@ -25,10 +25,11 @@ nodeDocker {
     for (distro in ['alpine', 'ubuntu']) {
       def dockerfileExists = fileExists "Dockerfile-${distro}"
       String imageName = "reynn/ansible:${params.ansibleVersion}-${distro}"
-      String buildArgs = " "
       if (dockerfileExists) {
         dockerImageNames.add(imageName)
-        def image = docker.build(imageName, buildArgs)
+        withEnv(["ANSIBLE_VERSION=${params.ansibleVersion}"]) {
+          def image = docker.build(imageName)
+        }
       }
     }
   }
