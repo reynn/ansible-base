@@ -15,7 +15,9 @@ properties([
 )
 
 List dockerImageNames = []
-
+if (!params.ansibleVersion) {
+  error('Unable to build image without providing the Ansible Version')
+}
 nodeDocker {
   stage('Checkout from GitHub') {
     checkout scm
