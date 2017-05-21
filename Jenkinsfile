@@ -37,7 +37,7 @@ nodeDocker {
   }
 
   if (env.BRANCH_NAME == 'master' || forcePush) {
-    stage("Publish Docker images to ${dockerRegistryUri}") {
+    stage("Publish Docker images") {
       for (imageName in dockerImageNames) {
         println "------------------- Image name: ${imageName} -------------------"
         docker.image(imageName).push()
