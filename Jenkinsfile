@@ -28,7 +28,7 @@ nodeDocker {
       if (dockerfileExists) {
         dockerImageNames.add(imageName)
         withEnv(["ANSIBLE_VERSION=${params.ansibleVersion}"]) {
-          def image = docker.build(imageName)
+          def image = docker.build(imageName, "-f Dockerfile-${distro} .")
         }
       }
     }
