@@ -24,13 +24,16 @@ nodeDocker {
   }
 
   stage('Build Images') {
-    for (distro in ['alpine', 'ubuntu']) {
+    for (distro in ['alpine', 'ubuntu', 'centos', 'fedora25']) {
       def dockerfileExists = fileExists "Dockerfile-${distro}"
-      String imageName = "reynn/ansible:${params.ansibleVersion}-${distro}"
+      String imageName = "reynn/ansible-${distro}:${params.ansibleVersion}"
       if (dockerfileExists) {
         dockerImageNames.add(imageName)
-        withEnv(["ANSIBLE_VERSION=${params.ansibleVersion}"]) {
-          def image = docker.build(imageName, "-f Dockerfile-${distro} .")
+        def ansibleVersions = params.ansibleVersion.split(',')
+        for(ver in ansibleVersions) {
+          withEnv(["ANSIBLE_VERSION=${ver}"]) {
+            def image = docker.build(imageName, "-f Dockerfile-${distro} .")
+          }
         }
       }
     }
@@ -38,9 +41,12 @@ nodeDocker {
 
   if (env.BRANCH_NAME == 'master' || forcePush) {
     stage("Publish Docker images") {
-      for (imageName in dockerImageNames) {
-        println "------------------- Image name: ${imageName} -------------------"
-        docker.image(imageName).push()
+      docker.withRegistry('https://index.docker.io/v1/', '2ba024f8-eb65-4045-a1eb-a9997699cbee') {
+        for (imageName in dockerImageNames) {
+          println "------------------- Image name: ${imageName} -------------------"
+          docker.image(imageName).push()
+          docker.image(imageName).push( 'latest' )
+        }
       }
     }
   }
