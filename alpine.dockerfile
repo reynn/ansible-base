@@ -2,7 +2,7 @@ FROM alpine:3.6
 
 WORKDIR /ansible
 
-ARG ANSIBLE_VERSION=2.3.0.0
+ARG ANSIBLE_VERSION=2.3.1.0
 
 LABEL ANSIBLE_VERSION=$ANSIBLE_VERSION \
       ALPINE_VERSION=3.6
@@ -12,6 +12,7 @@ RUN apk add --update --no-cache \
         py-pip \
         libffi \
         openssl-dev \
+        ca-certificates \
     && apk add --update --no-cache --virtual build-deps \
         python-dev \
         build-base \
