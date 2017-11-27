@@ -1,8 +1,12 @@
-FROM fedora:25
+ARG FEDORA_VERSION=7
+ARG ANSIBLE_VERSION=2.3.0.0
+
+FROM fedora:$FEDORA_VERSION
+
+LABEL ANSIBLE_VERSION=$ANSIBLE_VERSION \
+      FEDORA_VERSION=$FEDORA_VERSION
 
 WORKDIR /ansible
-
-ENV ANSIBLE_VERSION 2.3.0.0
 
 RUN dnf install -vy \
       python \
@@ -16,4 +20,4 @@ RUN dnf install -vy \
       openssl-devel \
       python-devel
 
-ENTRYPOINT [ "ansible" ]
+ENTRYPOINT [ "ansible-playbook" ]
