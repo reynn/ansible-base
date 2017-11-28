@@ -2,7 +2,7 @@ FROM fedora:25
 
 WORKDIR /ansible
 
-ARG ANSIBLE_VERSION=2.4.0.0
+ARG ANSIBLE_VERSION=2.4.1.0
 
 LABEL ANSIBLE_VERSION=$ANSIBLE_VERSION \
       FEDORA_VERSION=25
@@ -20,6 +20,6 @@ RUN dnf install -vy \
         python-devel \
         libffi-devel \
         redhat-rpm-config \
-    && dnf clean all
+    && rm -rf /var/cache/dnf
 
 ENTRYPOINT [ "ansible-playbook" ]
