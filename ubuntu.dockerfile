@@ -1,11 +1,11 @@
-FROM ubuntu:17.04
+FROM ubuntu:18.10
 
 WORKDIR /ansible
 
-ARG ANSIBLE_VERSION=2.4.2.0
+ARG ANSIBLE_VERSION=2.4.6.0
 
 LABEL ANSIBLE_VERSION=$ANSIBLE_VERSION \
-      UBUNTU_VERSION=17.04
+      UBUNTU_VERSION=18.10
 
 RUN apt-get update \
     && apt-get upgrade -y \

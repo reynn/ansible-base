@@ -1,11 +1,11 @@
-FROM alpine:3.6
+FROM alpine:3.8
 
 WORKDIR /ansible
 
-ARG ANSIBLE_VERSION=2.4.2.0
+ARG ANSIBLE_VERSION=2.4.6.0
 
 LABEL ANSIBLE_VERSION=$ANSIBLE_VERSION \
-      ALPINE_VERSION=3.6
+      ALPINE_VERSION=3.8
 
 RUN apk add --update --no-cache \
         python \
@@ -17,7 +17,8 @@ RUN apk add --update --no-cache \
         python-dev \
         build-base \
         libffi-dev \
-    && pip install --upgrade pip ansible==${ANSIBLE_VERSION} \
+    && pip install -U pip \
+    && pip install ansible==${ANSIBLE_VERSION} \
     && apk del build-deps
 
 ENTRYPOINT [ "ansible-playbook" ]

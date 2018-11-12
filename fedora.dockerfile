@@ -1,11 +1,11 @@
-FROM fedora:25
+FROM fedora:29
 
 WORKDIR /ansible
 
-ARG ANSIBLE_VERSION=2.4.2.0
+ARG ANSIBLE_VERSION=2.4.6.0
 
 LABEL ANSIBLE_VERSION=$ANSIBLE_VERSION \
-      FEDORA_VERSION=25
+      FEDORA_VERSION=29
 
 RUN dnf install -vy \
         python \
