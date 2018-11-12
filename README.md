@@ -15,8 +15,8 @@ Various editions of containers for Ansible. Very basic packages installed so if 
 
 ## Usage
 
-* Pull desired image, `docker pull quay.io/reynn/ansible-alpine:2.6.7.0`.
+* Pull desired image, `docker pull quay.io/reynn/ansible-alpine:2.7.1.0`.
 * Run image please mount desired playbooks/inventory data to `/ansible`
   ```shell
-  docker run -v "$(pwd):/ansible:rw" quay.io/reynn/ansible-alpine:2.6.7.0 -i inventories/hosts.yml playbooks/docker-host.yml
+  docker run -v "$(pwd):/ansible:rw" quay.io/reynn/ansible-alpine:2.7.1.0 -i inventories/hosts.yml playbooks/docker-host.yml
   ```
